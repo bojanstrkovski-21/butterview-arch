@@ -5,8 +5,10 @@
 Fast folder image viewer: one image, a thumbnail strip, a status line.
 Upstream is Drew (justaguylinux), GPL-3.0-or-later. Do not relicense.
 
-The workspace root is `/home/bojanstrko/Projects/butterview`. It is not a
-git repository. Do not `git init` it unless asked.
+The workspace root is `/home/bojanstrko/Projects/butterview`. It is a git
+repository on `main`. The remote is
+`git@github.com:bojanstrkovski-21/butterview-arch.git`. The user commits
+and pushes. Do not commit, push, or contact the remote unless asked.
 
 ## Layout
 
@@ -25,7 +27,7 @@ git repository. Do not `git init` it unless asked.
 - **Language**: Zig 0.16. Root module is `butterview-arch/src/main.zig`.
 - **Libraries**: SDL3, SDL3_image, SDL3_ttf, libjpeg-turbo (`turbojpeg`), libdbus. No GTK, no Qt.
 - **Other sources**: `butterview-arch/src/exif.zig`, `gif.zig`, `portal.zig`, `theme.zig`.
-- **Packaging**: `butterview-arch/flake.nix`, `butterview-arch/package.nix`, `butterview-arch/data/`.
+- **Packaging**: root `PKGBUILD` (local Arch package, output in `build/`) and `ensure-zig.install` (mise + Zig 0.16 at build time only). Also `butterview-arch/flake.nix`, `butterview-arch/package.nix`, `butterview-arch/data/`.
 
 ## Conventions
 
@@ -37,7 +39,7 @@ git repository. Do not `git init` it unless asked.
 
 - License stays GPL-3.0-or-later. See `butterview-arch/LICENSE`.
 - Rotate and crop must not overwrite the original. Saves write a new file beside it.
-- Do not `git init`, commit, or push unless the user asks.
+- Do not commit or push unless the user asks. The user pushes from their own terminal.
 - Never write credentials into this workspace.
 
 ## Frozen Files
@@ -54,6 +56,14 @@ butterview-arch/zig-out/bin/butterview --shot /tmp/out.png --size 1280x800 path
 ```
 
 Arch packages for a build and a working window: `mise`, `sdl3`, `sdl3_image`, `sdl3_ttf`, `libjpeg-turbo`, `dbus`, `fontconfig`. The compiler is Zig 0.16.0 from mise, not `extra/zig` (that is 0.17).
+
+Local package, from the repo root:
+
+```bash
+makepkg -s
+```
+
+The recipe creates `build/` and keeps the package there. Runtime dependencies are `sdl3`, `sdl3_image`, `sdl3_ttf`, `libjpeg-turbo`, `dbus`, and `fontconfig`. Zig is not one of them. A launch with no file opens the folder view. A file argument opens that image.
 
 ## Current state
 

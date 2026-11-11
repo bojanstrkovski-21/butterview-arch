@@ -43,3 +43,6 @@ Fixes in butterview-arch. Not sent upstream yet.
 - [x] Theme rgb(): clamp each channel to 0..255
 - [x] Paths: free a path once no item and no in-flight job still uses that id
 - [x] Folder view: q quits, Esc and Backspace close the view
+- [x] Arch package: PKGBUILD writes into build/, and ensure-zig.install supplies mise and Zig 0.16 only for the build
+- [x] No-file launch opens the folder view; a real image still opens
+- [ ] Send drafts/issues/ upstream (five files, one issue)
