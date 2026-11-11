@@ -910,6 +910,8 @@ const FolderView = struct {
             i = next orelse break;
         }
         v.sel = i;
+        // the folder itself open, so its children are on screen
+        v.expand(i);
     }
 
     fn expand(v: *FolderView, i: usize) void {
@@ -2422,7 +2424,7 @@ const App = struct {
         defer buf.deinit(gpa);
         const n = a.items.items.len;
         if (n == 0) {
-            buf.print(gpa, "No images in {s}", .{tilde(a.dir)}) catch {};
+            if (a.dir.len > 0) buf.print(gpa, "No images in {s}", .{tilde(a.dir)}) catch {};
         } else {
             const it = a.items.items[a.cur];
             buf.print(gpa, "{s}    {d} / {d}", .{ it.name, a.cur + 1, n }) catch {};
@@ -2748,10 +2750,14 @@ const App = struct {
             a.viewClose();
             return;
         }
-        if (a.dir.len == 0) return;
         a.closeMenu();
-        a.view = FolderView.init(a.dir) orelse return;
-        a.view.?.grid_sel = a.cur;
+        if (a.dir.len == 0) {
+            const home = if (c.SDL_getenv("HOME")) |h| std.mem.span(h) else "";
+            if (home.len > 1 and home[0] == '/') a.open(home);
+        }
+        const at = if (a.dir.len > 0) a.dir else if (c.SDL_getenv("HOME")) |h| std.mem.span(h) else "/";
+        a.view = FolderView.init(at) orelse return;
+        if (a.items.items.len > 0) a.view.?.grid_sel = a.cur;
         a.hinted = true;
         a.dirty = true;
         a.plan();
@@ -3333,10 +3339,21 @@ fn mark(what: []const u8) void {
     std.debug.print("{d:>6.1} ms  {s}\n", .{ @as(f64, @floatFromInt(c.SDL_GetTicksNS() - timing_t0)) / 1e6, what });
 }
 
+/// A path the user named. The current directory and an unexpanded desktop
+/// field code are not one: those open the folder view.
+fn explicitPath(arg: []const u8) bool {
+    if (arg.len == 0 or std.mem.eql(u8, arg, ".") or std.mem.eql(u8, arg, "./")) return false;
+    if (arg.len == 2 and arg[0] == '%') switch (arg[1]) {
+        'f', 'F', 'u', 'U' => return false,
+        else => {},
+    };
+    return true;
+}
+
 pub fn main(init: std.process.Init) !void {
     timing_on = c.SDL_getenv("BUTTERVIEW_TIMING") != null;
     timing_t0 = c.SDL_GetTicksNS();
-    var path: []const u8 = ".";
+    var path: ?[]const u8 = null;
     var shot: ?[]const u8 = null;
     var win_w: c_int = 1280;
     var win_h: c_int = 800;
@@ -3367,7 +3384,10 @@ pub fn main(init: std.process.Init) !void {
             std.debug.print(
                 \\butterview — a small image viewer
                 \\usage: butterview [file-or-folder]
+                \\       butterview
                 \\       butterview --version
+                \\
+                \\  With no file, the folder view is open. A file still opens that image.
                 \\
                 \\  Left/Right, Space             previous / next      Home/End  first / last
                 \\  wheel, + and -                zoom                 0  fit    1  actual size
@@ -3389,18 +3409,25 @@ pub fn main(init: std.process.Init) !void {
                 \\
             , .{});
             return;
-        } else {
+        } else if (explicitPath(arg)) {
             path = arg;
         }
     }
 
-    // A real path: the folder listing is built from it.
+    // A real path is opened. Anything else (no argument, `.`, an unexpanded
+    // desktop code, a path that is not there) opens the folder view instead
+    // of whatever directory the process was started in.
     var real_buf: [std.fs.max_path_bytes]u8 = undefined;
-    const real_len = std.Io.Dir.cwd().realPathFile(init.io, path, &real_buf) catch {
-        std.debug.print("butterview: no such file or folder: {s}\n", .{path});
-        std.process.exit(1);
-    };
-    path = real_buf[0..real_len];
+    var opened = false;
+    if (path) |p| {
+        if (std.Io.Dir.cwd().realPathFile(init.io, p, &real_buf)) |real_len| {
+            path = real_buf[0..real_len];
+            opened = true;
+        } else |_| {
+            std.debug.print("butterview: no such file or folder: {s}\n", .{p});
+            path = null;
+        }
+    }
 
     // Decoding passes through buffers of tens of megabytes. Left alone, the
     // allocator starts keeping buffers that size for reuse, one stock per
@@ -3450,11 +3477,13 @@ pub fn main(init: std.process.Init) !void {
     const font_thread = c.SDL_CreateThreadRuntime(fontWorker, "font", &shared, null, null);
     app.findPalette();
     app.loadState();
-    app.open(path);
+    if (opened) if (path) |p| app.open(p);
     if (goto) |g| app.cur = @min(g, app.items.items.len -| 1);
     var threads: [3]?*c.SDL_Thread = @splat(null);
     for (&threads) |*t| t.* = c.SDL_CreateThreadRuntime(worker, "decode", &shared, null, null);
     app.plan();
+    // No file: the folder view is the window. A named file stays on that image.
+    if (!opened) app.viewOpen();
     mark("folder listed, decoding started");
 
     const window = c.SDL_CreateWindow("butterview", win_w, win_h, c.SDL_WINDOW_RESIZABLE | c.SDL_WINDOW_HIGH_PIXEL_DENSITY) orelse {

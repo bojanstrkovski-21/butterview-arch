@@ -1,0 +1,59 @@
+#!/bin/bash
+# ensure-zig.install — build-time setup called by PKGBUILD.
+# This is not a pacman install script. Zig is not needed to run butterview.
+#
+# From the repository root, PKGBUILD build() runs:
+#   bash ensure-zig.install "$startdir"
+#
+# mise comes from pacman when it is missing. Zig 0.16.0 comes from mise,
+# pinned by mise.toml. An already installed 0.16 is left in place.
+# Arch extra/zig is 0.17 and is not installed.
+set -euo pipefail
+
+root=${1:-}
+if [[ -z $root || ! -f $root/mise.toml ]]; then
+  printf 'ensure-zig.install: pass the repository root (the directory with mise.toml).\n' >&2
+  exit 1
+fi
+cd "$root"
+
+if ! command -v pacman >/dev/null 2>&1; then
+  printf 'ensure-zig.install: pacman is not on PATH.\n' >&2
+  exit 1
+fi
+
+if ! command -v mise >/dev/null 2>&1 || ! pacman -Q mise >/dev/null 2>&1; then
+  printf 'Installing mise.\n'
+  if [[ ${EUID} -eq 0 ]]; then
+    pacman -S --needed --noconfirm mise
+  else
+    sudo pacman -S --needed --noconfirm mise
+  fi
+fi
+
+zig=$(mise which zig 2>/dev/null || true)
+if [[ -n $zig && -x $zig ]]; then
+  ver=$("$zig" version)
+  case $ver in
+    0.16.*)
+      printf 'Zig %s is already installed.\n' "$ver"
+      exit 0
+      ;;
+  esac
+  printf 'ensure-zig.install: mise selected Zig %s, and butterview needs 0.16.\n' "$ver" >&2
+  exit 1
+fi
+
+printf 'Installing Zig 0.16.0 with mise.\n'
+MISE_YES=1 mise install zig@0.16.0
+zig=$(mise which zig)
+ver=$("$zig" version)
+case $ver in
+  0.16.*)
+    printf 'Zig %s is installed.\n' "$ver"
+    ;;
+  *)
+    printf 'ensure-zig.install: expected Zig 0.16, found %s.\n' "${ver:-nothing}" >&2
+    exit 1
+    ;;
+esac
