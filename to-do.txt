@@ -1,0 +1,45 @@
+One item at a time. Copy the checklist under a new item. Check a box only when that step happened. The list below is the finished fixes, not this checklist.
+
+## Checklist
+
+## Problem
+
+## Approach
+
+## Automated validation
+
+- [ ] Focused checks passed
+- [ ] Complete local validation passed
+- [ ] Pull-request CI passed on the latest commit
+- [ ] Applicable security checks passed
+- [ ] Local Codex review loop completed
+
+## Manual testing
+
+- [ ] Required manual testing is complete
+- [ ] Screenshots or recordings are attached for visible changes
+
+## Review
+
+- [ ] Independent review is complete
+- [ ] Latest Codex review has no actionable findings
+- [ ] Actionable review threads are resolved
+
+## Limitations and follow-up
+
+None
+
+## Items
+
+Fixes in butterview-arch. Not sent upstream yet.
+
+- [x] Thumbnails: mark a queued thumb as loading, and destroy the old texture before replacing it
+- [x] One-frame GIF: stop the 5 ms wake once the decoder is finished
+- [x] Saving a GIF: write the frame on screen, not IMG_Load's still decode
+- [x] Short JPEG APP1: do not slice a segment shorter than the Exif header
+- [x] Save names: do not overwrite photo-rotated-99.jpg when every name is taken
+- [x] Portal threads: stop and join the folder dialog and the appearance query before SDL_Quit
+- [x] Folder probe: skip hidden names when hidden is off, and do not treat a scan cap of zero as an empty folder
+- [x] Theme rgb(): clamp each channel to 0..255
+- [x] Paths: free a path once no item and no in-flight job still uses that id
+- [x] Folder view: q quits, Esc and Backspace close the view

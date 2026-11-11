@@ -1,0 +1,22 @@
+# butterview.conf: copy to ~/.config/butterview/butterview.conf
+#
+# wallpaper = the command the w key runs. The image's path is added on
+# the end; a line with "$1" in it is run as written, the path there.
+# Lines starting with # are skipped: take the # off the one you use.
+
+# Wayland
+# wallpaper = awww img
+# wallpaper = swww img
+# wallpaper = pkill swaybg; swaybg -m fill -i "$1" &
+
+# X11
+# wallpaper = feh --bg-fill
+# wallpaper = xwallpaper --zoom
+# wallpaper = nitrogen --set-zoom-fill --save
+
+# Desktops
+# wallpaper = plasma-apply-wallpaperimage
+# wallpaper = gsettings set org.gnome.desktop.background picture-uri "file://$1"; gsettings set org.gnome.desktop.background picture-uri-dark "file://$1"
+
+# Anything else: a script of your own, given the path as $1
+# wallpaper = ~/.local/bin/set-wallpaper

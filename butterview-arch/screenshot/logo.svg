@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="66 114 384 300">
+  <!-- README copy of data/butterview.svg, cropped tighter. butterview: the Butterforge pat of butter, with a picture cut into its front face -->
+  <rect x="66" y="114" width="384" height="300" rx="56" fill="#1f1813"/>
+  <!-- side face -->
+  <polygon points="346,214 410,154 410,266 346,326" fill="#d9a32b"/>
+  <!-- top face -->
+  <polygon points="106,214 170,154 410,154 346,214" fill="#f8d986"/>
+  <!-- front face -->
+  <rect x="106" y="214" width="240" height="112" rx="10" fill="#f4c84f"/>
+  <!-- melt drip -->
+  <path d="M164 322 v34 a17 17 0 0 0 34 0 v-34 z" fill="#e8b737"/>
+  <!-- the picture: sun and hills carved into the front face -->
+  <circle cx="290" cy="248" r="16" fill="#1f1813"/>
+  <path d="M138 306 l48 -44 30 26 36 -36 60 54 z" fill="#1f1813"/>
+</svg>

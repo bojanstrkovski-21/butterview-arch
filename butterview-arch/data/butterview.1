@@ -1,0 +1,219 @@
+.TH BUTTERVIEW 1 "October 2026" "butterview 0.4.5" "User Commands"
+.SH NAME
+butterview \- a small, fast image viewer
+.SH SYNOPSIS
+.B butterview
+.RI [ file-or-folder ]
+.br
+.B butterview
+.B \-\-version
+.SH DESCRIPTION
+.B butterview
+shows one image at a time with a strip of the folder's thumbnails across
+the top and a status line underneath. Given a file it opens that image
+with its folder in the strip; given a folder it opens the first image in
+it; given nothing it uses the current directory.
+.PP
+It is a viewer first. Rotating and cropping change what is on screen and
+nothing else; saving writes a new file beside the original and never
+overwrites it.
+.SH KEYS
+.TP
+.B Left, Right, Space
+Previous and next image. Past the last image, Right moves on to the next
+sibling folder that holds images, from its first; before the first, Left
+goes to the previous one, from its last.
+.TP
+.B Home, End, PgUp, PgDn
+First and last image; ten at a time.
+.TP
+.B wheel, +, \-
+Zoom, centered on the pointer.
+.TP
+.B drag
+Pan a zoomed image.
+.TP
+.B 0, 1, double\-click
+Fit to the window, actual size, and switch between the two.
+.TP
+.B f, F11
+Full screen: the picture alone, without the strip or the status line.
+Esc leaves it;
+.B t
+shows the strip anyway. The window manager does the resizing; under one
+that only pretends (dwm with the fakefullscreen patch) use the window
+manager's own fullscreen key instead.
+.TP
+.B t
+Thumbnail strip on and off. Click a thumbnail to jump to it, scroll over
+the strip to move through it.
+.TP
+.B i
+Image information: size, dates and, for photographs, the camera, lens,
+shutter speed, aperture, ISO, focal length and location from EXIF.
+.TP
+.B r, Shift\-r
+Rotate right and left, on screen.
+.TP
+.B x
+Crop. A rectangle appears; drag to choose the area, Enter saves a copy,
+Esc cancels.
+.TP
+.B Ctrl\-s
+Save what is on screen (rotated, cropped) as a copy.
+.TP
+.B right\-click
+All of the above as a menu.
+.TP
+.B ?, F1
+The keys, on screen. The status line points to both until one has
+been opened.
+.TP
+.B Backspace, Enter
+The folder view: the folders as a tree down the left, from the home
+folder and from
+.IR / ,
+with the path to the folder shown already open and the number of images
+in each folder beside it (counting stops at 500); the folder's thumbnails
+in a grid on the right. In the tree Up and Down move, Right opens a
+branch or steps into it, Left closes one or steps out, Enter shows the
+folder. Tab moves to the grid, where the arrows move and Enter opens the
+image. A folder's arrow, its name and a thumbnail do the same with the
+mouse; + and \- size the thumbnails. A line over the grid names the
+folder, the count and the sort order. Backspace or Esc closes the view.
+.TP
+.B s
+Sort order: by name (naturally, so img2 comes before img10), newest
+first, oldest first. Kept between runs, with the thumbnail size and the
+hidden switch, in
+.IR $XDG_STATE_HOME/butterview/state .
+.TP
+.B ., Ctrl\-h
+Hidden files and folders (dot-names) shown or left out. Left out, the
+tree still shows the hidden folders on the way to the folder shown.
+.TP
+.B o
+Open a folder with the desktop's own dialog, asked for through the XDG
+desktop portal's FileChooser interface. Where no portal backend answers
+the status line says so. A folder or an image dropped on the window from
+a file manager is opened the same way.
+.TP
+.B y, Ctrl\-c
+Copy the image to the clipboard.
+.TP
+.B w
+Set the image as the wallpaper with the command on the
+.B wallpaper =
+line of
+.IR ~/.config/butterview/butterview.conf ,
+the image's path added on the end, as in
+.BR "wallpaper = awww img" .
+A line that has
+.B """$1"""
+in it is run as written, with the path there:
+.BR "wallpaper = pkill swaybg; swaybg \-i ""$1"" &" .
+Lines starting with
+.B #
+are skipped. Examples for other setters are in
+.IR /usr/share/doc/butterview/butterview.conf.example .
+.TP
+.B Del
+Move the image to the trash, after a confirmation dialog. Enter, y or the
+button confirm; anything else keeps the file.
+.TP
+.B q, Esc
+Quit. Esc first backs out of the menu, crop and full screen.
+.SH SAVED COPIES
+Saving writes a new file beside the original, named
+.IR photo\-rotated.jpg ,
+.I photo\-cropped.jpg
+or
+.I photo\-edited.jpg
+when both, with
+.IR \-2 ,
+.I \-3
+appended if the name is taken. PNGs stay PNG and lossless; JPEGs are
+re\-encoded at quality 95 without their EXIF block. Other formats are
+saved as PNG. The viewer then shows the new file.
+.SH FORMATS
+JPEG, PNG, GIF, WebP, AVIF, JPEG XL, TIFF, SVG, BMP, QOI and TGA.
+Animated GIFs play; an animated WebP shows its first frame. JPEGs are shown the way the camera says (EXIF orientation).
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Print the keys and exit.
+.TP
+.BR \-V ", " \-\-version
+Print the version and exit.
+.PP
+For checking a change without a screen:
+.TP
+.BI \-\-shot " out.png"
+Render one frame to a PNG and exit, with no window.
+.TP
+.BI \-\-size " WxH"
+Frame size for
+.BR \-\-shot " (default 1280x800)."
+.TP
+.BI \-\-goto " N"
+Start on the Nth image of the folder.
+.TP
+.BI \-\-zoom " factor"
+Start at that zoom.
+.TP
+.BI \-\-keys " list"
+Comma\-separated keys to press before the shot, as in
+.BR "\-\-keys r,save" .
+.SH COLORS
+Colors come from the first of these that defines any:
+.IR $XDG_CONFIG_HOME/butterview/colors.conf
+(lines of
+.IR "key = #rrggbb" ,
+keys
+.BR background ", " surface ", " text ", " muted ", " accent ", " border ),
+the GTK4 theme in
+.IR $XDG_CONFIG_HOME/gtk\-4.0/gtk.css
+(following one
+.BR @import ,
+which is how KDE and COSMIC pass GTK apps their colors),
+the GTK3 theme named in
+.I $XDG_CONFIG_HOME/gtk\-3.0/settings.ini
+(or in xfconf, on Xfce;
+.B gtk\-dark.css
+when dark is preferred), else the desktop's answer over the portal:
+dark or light, and its accent color, painted onto a built\-in set.
+.I $XDG_CONFIG_HOME
+defaults to
+.IR ~/.config .
+They are re\-read when the window gains focus.
+.SH ENVIRONMENT
+.TP
+.B BUTTERVIEW_TIMING
+When set, print each start\-up phase, where the colors came from, the
+status\-line messages and the moment the image is on screen to the
+terminal.
+.TP
+.B XDG_CONFIG_HOME
+Where the files below live; see COLORS.
+.SH FILES
+.TP
+.I ~/.config/butterview/colors.conf
+Color overrides, see COLORS.
+.TP
+.I ~/.config/butterview/butterview.conf
+The
+.B wallpaper =
+command for the
+.B w
+key.
+.TP
+.I /usr/share/doc/butterview/butterview.conf.example
+That file with a line for each common wallpaper setter, commented out.
+.SH SEE ALSO
+.BR gio (1),
+.BR wl\-copy (1),
+.BR xclip (1)
+.SH AUTHOR
+Drew (justaguylinux). Reports and patches:
+.UR https://justaguy.dev/drew/butterview
+.UE
