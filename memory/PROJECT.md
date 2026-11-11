@@ -55,5 +55,5 @@
 **Open:**
 
 - Source review finished the same day. Checked against the files. Highest: thumbnails can be decoded twice and the first texture leaked (`main.zig` `plan` never sets `thumb_state` to loading); a one-frame GIF keeps a 5 ms wake; saving a GIF uses `IMG_Load` instead of the frame on screen; a short JPEG APP1 segment can panic in `exif.zig`; save names past `-99` overwrite; folder-dialog and appearance threads are detached across `SDL_Quit`. Also: hidden-only folders are stepped into, `rgb()` channels are not clamped, paths are kept for the process lifetime, and `q` closes the folder view instead of quitting.
-- Remote is `https://github.com/bojanstrkovski-21/butterview-arch.git`. `push.sh` and `set-git-cred.sh` are at the workspace root. `upstream/` is gitignored and is not part of that repo.
+- Remote is `git@github.com:bojanstrkovski-21/butterview-arch.git`. `push.sh` and `set-git-cred.sh` are at the workspace root. `upstream/` is gitignored and is not part of that repo.
 - License remains upstream GPL-3.0-or-later.

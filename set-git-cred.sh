@@ -18,8 +18,8 @@ git config --global pull.rebase false
 git config --global user.name "bojanstrkovski-21"
 git config --global user.email "bojanstrkovski.21@gmail.com"
 git config --global push.default simple
-git remote set-url origin "https://github.com/bojanstrkovski-21/$project.git" || \
-  git remote add origin "https://github.com/bojanstrkovski-21/$project.git"
+git remote set-url origin "git@github.com:bojanstrkovski-21/$project.git" || \
+  git remote add origin "git@github.com:bojanstrkovski-21/$project.git"
 
 echo "Everything set"
 echo "################################################################"

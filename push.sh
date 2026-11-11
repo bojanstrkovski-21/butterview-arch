@@ -34,9 +34,9 @@ git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "Not inside a git 
 
 origin_url="$(git remote get-url origin 2>/dev/null)" || { echo "No 'origin' remote configured. Aborting."; exit 1; }
 case "$origin_url" in
-    https://github.com/bojanstrkovski-21/butterview-arch.git) ;;
+    git@github.com:bojanstrkovski-21/butterview-arch.git) ;;
     *)
-        echo "'origin' does not point at https://github.com/bojanstrkovski-21/butterview-arch.git ($origin_url). Aborting."
+        echo "'origin' does not point at git@github.com:bojanstrkovski-21/butterview-arch.git ($origin_url). Aborting."
         exit 1
         ;;
 esac
